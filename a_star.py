@@ -5,6 +5,9 @@ from ast import literal_eval
 # List where the path will be stored
 path = []
 
+# Helping dictionary
+node_dict = {}
+
 # Class node
 class Node:
 	def __init__(self, name, neighbors, heuristic, cost):
@@ -40,6 +43,7 @@ def get_path(came_from, start, goal):
 
 # A* implementation
 def a_star(nodes, start, goal):
+	global node_dict
 	count = 0
 	open_set = []
 	open_set.append((0, count, start))
@@ -65,10 +69,7 @@ def a_star(nodes, start, goal):
 			return True
 
 		for neighbor in current.neighbors:
-			for node in nodes:
-				if neighbor == node.name:
-					neighbor_node = node
-					break
+			neighbor_node = node_dict[neighbor]
 
 			temp_g_score = g_score[current.name] + current.get_gscore(neighbor)
 
@@ -86,7 +87,7 @@ def a_star(nodes, start, goal):
 
 # Parse the yaml file, create the node objects and call the A*
 def main():
-	global path
+	global path, node_dict
 	graph_file = yaml.load(open(sys.argv[1], 'r'), Loader=yaml.FullLoader)
 	
 	nodes = []
@@ -102,9 +103,8 @@ def main():
 			other_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost'])
 			nodes.append(other_node)
 	
-
+	node_dict = {node.name : node for node in nodes}
 	print (path) if (a_star(nodes, start_node, goal_node)) else print("Path not found")
-
 
 
 
