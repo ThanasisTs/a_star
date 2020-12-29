@@ -1,0 +1,33 @@
+# Nodes
+nodes: "['S', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I']"
+start: S
+goal: G
+
+# Heuristics
+heuristics:
+  S: 1050
+  A: 1049
+  B: 1045
+  C: 1050
+  D: 1022
+  E: 1050
+  F: 1069
+  H: 1042
+  I: 882
+  G: 0
+
+# Neighbors of each node
+neighbors:
+  S: "['A', 'C']"
+  A: "['S', 'B']"
+  B: "['A', 'D']"
+  C: "['S', 'E']"
+  D: "['B', 'I']"
+  E: "['C', 'H', 'F']"
+  F: "['E']"
+  G: "['I']"
+  H: "['E', 'I']"
+  I: "['D', 'H', 'G']"
+
+# Edge costs (needs to be extended to edge-varying costs)
+edge_cost: 960
