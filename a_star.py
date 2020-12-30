@@ -21,7 +21,7 @@ class Node:
 	def get_gscore(self, neighbor):
 		return self.g_score[neighbor]
 
-# Backtrack to get the path if the A* succeeds
+# Backtrack to get the path if A* succeeds
 def get_path(previous_node_in_path, start, goal):
 	global path
 	
