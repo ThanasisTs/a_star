@@ -1,6 +1,5 @@
 import sys
 import yaml
-from ast import literal_eval
 
 # List where the path will be stored
 path = []
@@ -101,7 +100,7 @@ def a_star(nodes, start, goal):
 	return False
 
 
-# Parse the yaml file, create the node objects and call the A*
+# Parse the yaml file, create the node objects and call A*
 def main():
 	global path, node_dict
 	# open yaml file
@@ -110,15 +109,15 @@ def main():
 	nodes = []
 
 	# parse yaml file and create nodes
-	for node in literal_eval(graph_file['nodes']):
+	for node in graph_file['nodes']:
 		if node == graph_file['start']:
-			start_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost']) 
+			start_node = Node(node, graph_file['neighbors'][node], graph_file['heuristics'][node], graph_file['edge_cost']) 
 			nodes.append(start_node)
 		elif node == graph_file['goal']:
-			goal_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost'])
+			goal_node = Node(node, graph_file['neighbors'][node], graph_file['heuristics'][node], graph_file['edge_cost'])
 			nodes.append(goal_node)
 		else:
-			other_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost'])
+			other_node = Node(node, graph_file['neighbors'][node], graph_file['heuristics'][node], graph_file['edge_cost'])
 			nodes.append(other_node)
 	
 	# call A* and print the path if it exists
