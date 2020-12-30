@@ -22,64 +22,80 @@ class Node:
 		return self.g_score[neighbor]
 
 # Backtrack to get the path if the A* succeeds
-def get_path(came_from, start, goal):
+def get_path(previous_node_in_path, start, goal):
 	global path
-	while came_from:
+	
+	# while there are objects in the dicrionary
+	while previous_node_in_path:
+		# append the goal node and go to the previous one
 		if goal not in path:
 			path.append(goal)
-			next_node = came_from[goal]
-			del came_from[goal]
+			next_node = previous_node_in_path[goal]
+			del previous_node_in_path[goal]
+		# append the current node and go to the previous one
 		else:
-
 			path.append(next_node)
 			try:
-				next_node_key = came_from[next_node]
-				del came_from[next_node]
+				next_node_key = previous_node_in_path[next_node]
+				del previous_node_in_path[next_node]
 				next_node = next_node_key
 			except:
-				came_from = {}
+				previous_node_in_path = {}
+	# reverse the path so its form is start -> ... -> goal
 	path = path[::-1]
 
 
 # A* implementation
 def a_star(nodes, start, goal):
 	global node_dict
-	count = 0
-	open_set = []
-	open_set.append((0, count, start))
-	came_from = {}
+
+	# dictionary to keep track of f_scores for each node
+	open_set = {}
+	open_set.update({0 : start})
+
+	# dictionary to keep the previous node of each node in the final path
+	# used to get the path at the end of the algorithm
+	previous_node_in_path = {}
 	
+	# g_score for each node
 	g_score = {node.name : float("inf") for node in nodes}
 	g_score[start.name] = 0
 
+	# f_score for each node
 	f_score = {node.name : float("inf") for node in nodes}
 	f_score[start.name] = start.heuristic
 
+	# set of nodes to be processed
 	open_set_hash = {start}
 
+	# while there are nodes to be processed
 	while open_set:
-
-		current = open_set[list(zip(*open_set))[0].index(min(list(zip(*open_set))[0]))][2]
-		del open_set[list(zip(*open_set))[0].index(min(list(zip(*open_set))[0]))]
-
+		# get the node with the lowest f_score and remove it
+		current = open_set[min(list(open_set.keys()))]
+		del open_set[min(list(open_set.keys()))]
 		open_set_hash.remove(current)
 
+		# if the current node is the goal node, end the algo and get the path
 		if current == goal:
-			get_path(came_from, start.name, goal.name)
+			get_path(previous_node_in_path, start.name, goal.name)
 			return True
 
+		# for each neighbor
 		for neighbor in current.neighbors:
 			neighbor_node = node_dict[neighbor]
 
+			# compute the new g_score
 			temp_g_score = g_score[current.name] + current.get_gscore(neighbor)
 
+			# if new g_score is less than the last one, update the g_score, f_score
+			# and add the node to the open_set if it does not exist or update its f_score
+			# in order to be processed later
 			if temp_g_score < g_score[neighbor]:
-				came_from[neighbor] = current.name
+				previous_node_in_path[neighbor] = current.name
 				g_score[neighbor] = temp_g_score
 				f_score[neighbor] = temp_g_score + neighbor_node.heuristic
 				if neighbor not in open_set_hash:
-					count += 1
-					open_set.append((f_score[neighbor], count, neighbor_node))
+					open_set.update({f_score[neighbor] : neighbor_node})
 					open_set_hash.add(neighbor_node)
 
 	return False
@@ -88,10 +104,12 @@ def a_star(nodes, start, goal):
 # Parse the yaml file, create the node objects and call the A*
 def main():
 	global path, node_dict
+	# open yaml file
 	graph_file = yaml.load(open(sys.argv[1], 'r'), Loader=yaml.FullLoader)
 	
 	nodes = []
 
+	# parse yaml file and create nodes
 	for node in literal_eval(graph_file['nodes']):
 		if node == graph_file['start']:
 			start_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost']) 
@@ -103,6 +121,7 @@ def main():
 			other_node = Node(node, literal_eval(graph_file['neighbors'][node]), graph_file['heuristics'][node], graph_file['edge_cost'])
 			nodes.append(other_node)
 	
+	# call A* and print the path if it exists
 	node_dict = {node.name : node for node in nodes}
 	print (path) if (a_star(nodes, start_node, goal_node)) else print("Path not found")
 
