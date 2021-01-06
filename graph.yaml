@@ -30,4 +30,4 @@ neighbors:
   I: ['D', 'H', 'G']
 
 # Edge costs (needs to be extended to edge-varying costs)
-edge_cost: 960
+edge_costs: 960
